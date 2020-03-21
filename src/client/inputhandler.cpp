@@ -91,6 +91,9 @@ void KeyCache::populate()
 		handler->listenForKey(EscapeKey);
 		handler->listenForKey(CancelKey);
 	}
+
+	//RenderingEngine::get_raw_device()
+    //				->getCursorControl()->setVisible(true);
 }
 
 bool MyEventReceiver::OnEvent(const SEvent &event)
@@ -254,5 +257,5 @@ void RandomInputHandler::step(float dtime)
 				rightreleased = true;
 		}
 	}
-	mousepos += mousespeed;
+	//mousepos += mousespeed;
 }

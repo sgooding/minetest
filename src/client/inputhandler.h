@@ -279,12 +279,18 @@ public:
 		m_receiver->listenForKey(keyCode);
 	}
 	virtual void dontListenForKeys() { m_receiver->dontListenForKeys(); }
+
 	virtual v2s32 getMousePos()
 	{
-		if (RenderingEngine::get_raw_device()->getCursorControl()) {
-			return RenderingEngine::get_raw_device()
-					->getCursorControl()
-					->getPosition();
+		bool control = RenderingEngine::get_raw_device()->getCursorControl();
+
+		if (control)
+        {
+			v2s32 position = RenderingEngine::get_raw_device()
+			->getCursorControl()
+			->getPosition();
+			m_mousepos = position;
+			return position;
 		}
 
 		return m_mousepos;
@@ -292,10 +298,12 @@ public:
 
 	virtual void setMousePos(s32 x, s32 y)
 	{
+		std::cout << "setMousePos: " << x << ", " << y << std::endl;
 		if (RenderingEngine::get_raw_device()->getCursorControl()) {
 			RenderingEngine::get_raw_device()
 					->getCursorControl()
 					->setPosition(x, y);
+			std::cout << "Set mouse position to " << x << ", " << y << std::endl;
 		} else {
 			m_mousepos = v2s32(x, y);
 		}

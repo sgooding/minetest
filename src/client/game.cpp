@@ -2400,18 +2400,58 @@ void Game::updateCameraOrientation(CameraOrientation *cam, float dtime)
 		cam->camera_pitch  = g_touchscreengui->getPitch();
 	} else {
 #endif
-		v2s32 center(driver->getScreenSize().Width / 2, driver->getScreenSize().Height / 2);
-		v2s32 dist = input->getMousePos() - center;
+		static v2s32 last_state;
+		v2s32 mouse = input->getMousePos();
+		static float delta_yaw = 0.0;
+		if(last_state.X != mouse.X || last_state.Y != mouse.Y)
+		{
+			//v2s32 center(driver->getScreenSize().Width / 2, driver->getScreenSize().Height / 2);
+			//v2s32 dist = input->getMousePos() - center;
 
-		if (m_invert_mouse || camera->getCameraMode() == CAMERA_MODE_THIRD_FRONT) {
-			dist.Y = -dist.Y;
+			float c_x = float(driver->getScreenSize().Width) / 2.0;
+			float c_y = float(driver->getScreenSize().Height) / 2.0;
+			float dist_x = mouse.X - c_x;
+			float dist_y = mouse.Y - c_y;
+
+			delta_yaw = dist_x * 1.0;
+
+			cam->camera_pitch = dist_y * 1.0;
+
+			std::cout << dtime << " : " << std::endl
+					  << " In  : x,       y : " << mouse.X << ", " << mouse.Y << std::endl
+					  << " Dist: x,       y : " << dist_x << ", " << dist_y   << std::endl
+					  << " Cam : yaw, pitch : " << cam->camera_pitch << ", " << cam->camera_yaw
+					  << std::endl;
+
+			//cam->camera_yaw   -= dist.X * m_cache_mouse_sensitivity;
+			//cam->camera_pitch += dist.Y * m_cache_mouse_sensitivity;
+
+			cam->camera_yaw = rangelim(cam->camera_yaw, -180.0, 180.0);
+			cam->camera_pitch = rangelim(cam->camera_pitch, -89.5, 89.5);
+
+		}
+		else
+		{
+			delta_yaw = 0.0;
 		}
 
-		cam->camera_yaw   -= dist.X * m_cache_mouse_sensitivity;
-		cam->camera_pitch += dist.Y * m_cache_mouse_sensitivity;
 
-		if (dist.X != 0 || dist.Y != 0)
-			input->setMousePos(center.X, center.Y);
+		last_state = input->getMousePos();
+
+		cam->camera_yaw -= delta_yaw;
+
+
+        //std::cout << "Mouse Pos: " << input->getMousePos().X << ", " << input->getMousePos().Y << std::endl;
+
+//		if (m_invert_mouse || camera->getCameraMode() == CAMERA_MODE_THIRD_FRONT) {
+//			dist.Y = -dist.Y;
+//		}
+
+
+        //std::cout << "dist.X " << dist.X << " dist.Y " << dist.Y << std::endl;
+
+		//if (dist.X != 0 || dist.Y != 0)
+		//	input->setMousePos(center.X, center.Y);
 #ifdef HAVE_TOUCHSCREENGUI
 	}
 #endif
@@ -2422,7 +2462,12 @@ void Game::updateCameraOrientation(CameraOrientation *cam, float dtime)
 		cam->camera_pitch += input->joystick.getAxisWithoutDead(JA_FRUSTUM_VERTICAL) * c;
 	}
 
-	cam->camera_pitch = rangelim(cam->camera_pitch, -89.5, 89.5);
+
+
+    //std::cout << "Center: " << center.X << ", " << center.Y << std::endl;
+    //std::cout << "Yaw   : " << cam->camera_yaw << std::endl;
+    //std::cout << "Pitch : " << cam->camera_pitch << std::endl;
+
 }
 
 
